@@ -1,0 +1,90 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct {
+    int balance;
+    int pin;
+} Account;
+
+void displayMenu() {
+    printf("1. Check Balance\n");
+    printf("2. Withdraw\n");
+    printf("3. Deposit\n");
+    printf("4. Exit\n");
+    printf("Choose an option: ");
+}
+
+void saveAccountData(Account account) {
+    FILE* file = fopen("account.csv", "w");
+    if (file == NULL) {
+
+        return;
+    }
+    fprintf(file, "%d,%d", account.balance, account.pin);
+    fclose(file);
+}
+
+Account loadAccountData() {
+    Account account;
+    FILE* file = fopen("account.csv", "r");
+    if (file == NULL) {
+
+        account.balance = 50000;
+       return account;
+    }
+    fscanf(file, "%d,%d", &account.balance, &account.pin);
+    fclose(file);
+    return account;
+}
+
+int main() {
+    Account account = loadAccountData();
+    int option, amount;
+
+    printf("Welcome to the ATM!\n\n");
+    printf("Please enter your PIN: ");
+    scanf("%d", &account.pin);
+
+    if (account.pin == account.pin) {
+        printf("PIN accepted. Access granted\n");
+    } else {
+        printf("Pin denied. Access not granted\n");
+        return 0;
+    }
+
+    while (1) {
+        displayMenu();
+        scanf("%d", &option);
+
+        switch (option) {
+            case 1:
+                printf("Your balance is: $%d\n", account.balance);
+                printf("You have a sufficient funds on your account:\n");
+             break;
+            case 2:
+                printf("Enter the amount to withdraw: $");
+                scanf("%d", &amount);
+                if (amount <= account.balance) {
+                    account.balance -= amount;
+                    printf("Withdrawal successful. Remaining balance: $%d\n", account.balance);
+                    saveAccountData(account);
+                } else {
+                    printf("Insufficient balance\n");
+                }
+                break;
+            case 3:
+                printf("Enter the amount to deposit: $");
+                scanf("%d", &amount);
+                account.balance += amount;
+                printf("Deposit successful. New balance: $%d\n", account.balance);
+                saveAccountData(account);
+                break;
+            case 4:
+                printf("Thank you for using the ATM. Goodbye!\n");
+                saveAccountData(account);
+                return 0;
+            default:
+                printf("Invalid option\n");
+        }
+    }
+}
